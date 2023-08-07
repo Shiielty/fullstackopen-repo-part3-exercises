@@ -61,6 +61,44 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
+const checkSameName = (personName) => {
+  return persons.some((person) => person.name === personName);
+};
+
+app.post("/api/persons", (request, response) => {
+  const newId = Math.round(Math.random() * 1000);
+  const requestBody = request.body;
+
+  if (!requestBody.name) {
+    return response.status(400).json({
+      error: "name is missing",
+    });
+  }
+
+  if (!requestBody.number) {
+    return response.status(400).json({
+      error: "number is missing",
+    });
+  }
+
+  if (checkSameName(requestBody.name)) {
+    return response.status(400).json({
+      error: "name must be unique",
+    });
+  }
+
+  const newPerson = {
+    id: newId,
+    name: requestBody.name,
+    number: requestBody.number,
+  };
+
+  persons = persons.concat(newPerson);
+
+  console.log(newPerson);
+  response.json(newPerson);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`server listening to port ${PORT}`);
